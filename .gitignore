@@ -2,3 +2,7 @@ node_modules/
 .DS_Store
 *.log
 .vite/
+
+# 现场使用的单文件产物随仓库提交（本机全局 gitignore 忽略了 dist/，这里显式放行）
+!dist/
+!dist/index.html

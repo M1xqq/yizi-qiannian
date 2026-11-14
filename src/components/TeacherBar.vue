@@ -6,10 +6,11 @@ const props = defineProps({
   total: { type: Number, required: true },
   titles: { type: Array, default: () => [] },
   elapsed: { type: Number, default: 0 },
-  fullscreen: { type: Boolean, default: false }
+  fullscreen: { type: Boolean, default: false },
+  paused: { type: Boolean, default: false }
 })
 
-const emit = defineEmits(['prev', 'next', 'replay', 'reset', 'toggle-fullscreen', 'jump'])
+const emit = defineEmits(['prev', 'next', 'replay', 'reset', 'toggle-pause', 'toggle-fullscreen', 'jump'])
 
 const clock = computed(() => {
   const m = Math.floor(props.elapsed / 60)
@@ -40,6 +41,9 @@ const clock = computed(() => {
 
     <span class="clock" :title="`本节课程已进行 ${clock}`">{{ clock }}</span>
 
+    <button class="tool" :class="{ on: paused }" title="暂停／继续动画（P）" @click="emit('toggle-pause')">
+      {{ paused ? '▶' : '❚❚' }}
+    </button>
     <button class="tool" title="重播本节动画（R）" @click="emit('replay')">↻</button>
     <button class="tool" title="重置本节／整节课（Shift+R 全量重置）" @click="emit('reset')">⟲</button>
     <button class="tool" title="全屏投屏（F）" @click="emit('toggle-fullscreen')">
@@ -164,6 +168,11 @@ const clock = computed(() => {
 .tool:hover {
   background: rgba(42, 42, 42, 0.06);
   color: var(--ink);
+}
+
+.tool.on {
+  background: var(--cinnabar);
+  color: #fff;
 }
 
 </style>

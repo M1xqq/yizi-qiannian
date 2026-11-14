@@ -1,303 +1,131 @@
 <script setup>
-import { ref } from 'vue'
-import StageFrame from '../components/StageFrame.vue'
-import Glyph from '../components/Glyph.vue'
-import NatureIcon from '../components/NatureIcon.vue'
+import { onMounted, ref } from 'vue'
+import SceneArt from '../components/SceneArt.vue'
 
-const pairs = [
-  { nature: 'sun', glyph: 'ri', char: '日', line: '一个圆，中间一短横：太阳的样子。' },
-  { nature: 'mountain', glyph: 'shan', char: '山', line: '三个尖尖的山峰，中间最高。' },
-  { nature: 'tree', glyph: 'mu', char: '木', line: '上有枝、中有干、下有根的一棵树。' }
+const show = ref(false)
+onMounted(() => {
+  setTimeout(() => { show.value = true }, 300)
+})
+
+const materials = [
+  { type: 'shell', name: '龟甲', line: '把龟壳背面磨平，再刻上字' },
+  { type: 'bone', name: '牛骨', line: '牛肩胛骨更大片，能刻更多字' },
+  { type: 'bronze', name: '青铜器', line: '字先刻在泥模上，再铸进铜器' }
 ]
-
-const shown = ref(1)
-const demoKey = ref(0)
-
-function more() {
-  if (shown.value < pairs.length) shown.value += 1
-}
-
-function replay() {
-  shown.value = 1
-  demoKey.value += 1
-}
 </script>
 
 <template>
-  <StageFrame
-    kicker="第二幕 · 穿越三千年"
-    title="商代人怎么写字？"
-    sub="他们把字刻在龟甲和兽骨上，用来问天、记事——这就是「甲骨文」。"
-    section="02 / 07"
-  >
-    <div class="grid">
-      <div class="left">
-        <div class="card relic">
-          <div class="relic-icons">
-            <div class="relic-item">
-              <NatureIcon type="gujia" />
-              <span>龟甲</span>
-            </div>
-            <div class="relic-item">
-              <NatureIcon type="bone" />
-              <span>兽骨</span>
-            </div>
-          </div>
-          <ul>
-            <li>先写后刻：毛笔书写，刀刻成文</li>
-            <li>内容多是占卜：下雨吗？收成好吗？</li>
-            <li>字很细，笔画又直又硬</li>
-          </ul>
-        </div>
-        <p class="note">这些字为什么长得像画？往下看。</p>
+  <div class="stage">
+    <header class="stage-head">
+      <div>
+        <p class="kicker"><i></i>第二幕 · 回到商代</p>
+        <h1 class="stage-title">三千多年前，人们这样记事情</h1>
+        <p class="stage-sub">约公元前 1300 年 · 商代</p>
       </div>
+      <span class="chip">那时候还没有纸</span>
+    </header>
 
-      <div class="right" :key="demoKey">
-        <div
-          v-for="(p, i) in pairs"
-          :key="p.glyph"
-          class="pair"
-          :class="{ show: i < shown, ghost: i >= shown }"
-          :style="{ '--d': i * 0.1 + 's' }"
-        >
-          <div class="cell nature-cell">
-            <div class="art"><NatureIcon :type="p.nature" /></div>
-            <span class="cap">看到</span>
+    <div class="stage-body">
+      <div class="split wide-left">
+        <div>
+          <div class="scene" :class="{ in: show }" style="height: 396px">
+            <SceneArt type="shang" />
           </div>
-          <span class="arrow">→</span>
-          <div class="cell glyph-cell">
-            <div class="art"><Glyph :name="p.glyph" /></div>
-            <span class="cap">甲骨文</span>
-          </div>
-          <span class="arrow">→</span>
-          <div class="cell char-cell">
-            <div class="art"><b>{{ p.char }}</b></div>
-            <span class="cap">今天的字</span>
-          </div>
-          <p class="line">{{ p.line }}</p>
-          <span v-if="i >= shown" class="lock">?</span>
+          <p class="caption">商代的小村落：茅草屋、远处的山、刚升起的太阳、一堆火</p>
+        </div>
+
+        <div>
+          <p class="lead">
+            要记一件事，古人就把它<b>刻在</b><br />
+            能长期保存的东西上。
+          </p>
+
+          <ul class="materials">
+            <li
+              v-for="(m, i) in materials"
+              :key="m.name"
+              :style="{ animationDelay: `${0.3 + i * 0.16}s` }"
+            >
+              <span class="mini"><SceneArt :type="m.type" /></span>
+              <span class="txt">
+                <b>{{ m.name }}</b>
+                <em>{{ m.line }}</em>
+              </span>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
-
-    <template #footer>
-      <button v-if="shown < pairs.length" class="btn" @click="more">再看一个字 →</button>
-      <template v-else>
-        <span class="ask">你发现了吗——古人造字，先看世界，再画下来。</span>
-        <button class="btn ghost" @click="replay">重新演示</button>
-      </template>
-    </template>
-  </StageFrame>
+  </div>
 </template>
 
 <style scoped>
-.grid {
-  display: grid;
-  grid-template-columns: 0.8fr 1.2fr;
-  gap: 48px;
-  width: 100%;
-  max-width: 1500px;
-  align-items: stretch;
-}
-
-.left {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 14px;
-}
-
-.relic {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.relic-icons {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.relic-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 13px 8px;
-  border-radius: 14px;
-  background: linear-gradient(160deg, #fdfbf6, #f4eee2);
-  border: 1px solid rgba(42, 42, 42, 0.05);
-  color: var(--ink-2);
-}
-
-.relic-item > :first-child {
-  width: min(76%, 96px);
-  aspect-ratio: 1;
-}
-
-.relic-item span {
-  font-size: 14px;
-  color: var(--ink-3);
-  letter-spacing: 0.16em;
-}
-
-.relic ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 9px;
-}
-
-.relic li {
-  position: relative;
-  padding-left: 1.15em;
-  font-size: 17px;
-  line-height: 1.6;
-  color: var(--ink-2);
-}
-
-.relic li::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0.78em;
-  width: 0.55em;
-  height: 1px;
-  background: var(--cinnabar);
-  opacity: 0.7;
-}
-
-.note {
-  margin: 0 0 0 4px;
-  font-size: 14px;
-  color: var(--ink-4);
-  letter-spacing: 0.06em;
-}
-
-.right {
-  display: grid;
-  gap: 14px;
-  align-content: center;
-}
-
-.pair {
-  position: relative;
-  display: grid;
-  grid-template-columns: 92px auto 92px auto 92px;
-  grid-template-rows: auto auto;
-  align-items: center;
-  justify-content: start;
-  column-gap: 16px;
-  row-gap: 6px;
-  padding: 14px 24px;
-  border-radius: 18px;
-  background: var(--card);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid rgba(42, 42, 42, 0.05);
+.scene {
   opacity: 0;
-  transform: translateY(14px) scale(0.985);
-  transition: opacity 0.5s ease var(--d), transform 0.5s cubic-bezier(0.2, 0.7, 0.3, 1) var(--d);
+  transform: scale(0.98);
+  transition: opacity 0.9s ease, transform 0.9s ease;
 }
-
-.pair.show {
+.scene.in {
   opacity: 1;
-  transform: none;
+  transform: scale(1);
 }
 
-.pair.ghost .cell,
-.pair.ghost .arrow {
-  opacity: 0.1;
-  filter: blur(1.5px);
-}
-
-.pair.ghost {
-  opacity: 1;
-  transform: none;
-  border-style: dashed;
-  box-shadow: none;
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.pair.ghost .line {
-  visibility: hidden;
-}
-
-.lock {
-  position: absolute;
-  left: 50%;
-  top: 30%;
-  transform: translate(-50%, -50%);
-  font-size: 34px;
-  color: var(--ink-4);
-  font-weight: 700;
-}
-
-.cell {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  color: var(--ink);
-  transition: opacity 0.3s ease;
-}
-
-.art {
-  height: 84px;
-  aspect-ratio: 1;
+.materials {
+  list-style: none;
+  margin: 28px 0 0;
+  padding: 0;
   display: grid;
-  place-items: center;
-  width: 100%;
+  gap: 13px;
 }
 
-.art > :deep(*) {
+.materials li {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 13px 20px 13px 13px;
+  background: var(--card);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+  border-left: 3px solid var(--bronze);
+  opacity: 0;
+  animation: rise 0.6s ease forwards;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateX(18px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.mini {
+  flex: 0 0 auto;
+  width: 76px;
+  height: 58px;
+  display: block;
+  border-radius: 10px;
+  background: var(--paper-warm);
+  overflow: hidden;
+}
+
+.mini :deep(svg) {
   width: 100%;
   height: 100%;
 }
 
-.char-cell b {
-  font-size: 48px;
-  line-height: 1;
-  font-weight: 500;
-  font-family: var(--kai);
+.txt {
+  display: grid;
+  gap: 3px;
 }
 
-.cap {
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  color: var(--ink-4);
-  white-space: nowrap;
-}
-
-.arrow {
-  color: var(--cinnabar);
-  opacity: 0.45;
-  font-size: 20px;
-  align-self: center;
-}
-
-.line {
-  grid-column: 1 / -1;
-  justify-self: end;
-  margin: 2px 0 0;
-  font-size: 13px;
-  color: var(--ink-4);
+.txt b {
+  font-size: 26px;
+  color: var(--brown);
   letter-spacing: 0.04em;
 }
 
-.glyph-cell {
-  color: var(--cinnabar);
+.txt em {
+  font-style: normal;
+  font-size: 19px;
+  color: var(--ink-3);
+  letter-spacing: 0.02em;
 }
-
-.nature-cell {
-  color: var(--ink-2);
-}
-
-.ask {
-  font-size: 18px;
-  color: var(--cinnabar);
-  letter-spacing: 0.06em;
-}
-
 </style>

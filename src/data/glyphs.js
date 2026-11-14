@@ -7,18 +7,19 @@
  * 校核记录写在 README 的「字形校核」一节。
  *
  * 每个字形都是 100 × 100 viewBox 内的内联 SVG，
- * 统一使用 currentColor，便于随主题换色。
+ * 统一使用 currentColor；全部以「描线」形式给出，
+ * 以便 Glyph 组件做逐笔书写的动画。
  */
 
-const stroke = (d, w = 4.2) =>
+const stroke = (d, w = 4.6) =>
   `<g fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round">${d}</g>`
 
 export const GLYPHS = {
   shan: {
     char: '山',
     pinyin: 'shān',
-    nature: '山',
-    sense: '像三座并立的山峰，中间高、两边低。',
+    nature: 'mountain',
+    sense: '中间高、两边低，就是三座并立的山峰。',
     jiagu: stroke(`
       <path d="M14 84h72"/>
       <path d="M20 84 28 58 38 84"/>
@@ -38,72 +39,85 @@ export const GLYPHS = {
       <path d="M30 38v46"/>
       <path d="M70 44v40"/>
       <path d="M20 84h60"/>`,
-      4.6
+      4.4
     )
   },
 
   ri: {
     char: '日',
     pinyin: 'rì',
-    nature: '太阳',
-    sense: '中间一个圆，是太阳；中间一短横，表示太阳的光或影子。',
+    nature: 'sun',
+    sense: '本来就是一个圆圈，中间那一笔是太阳里的光。',
     jiagu: stroke(`
       <circle cx="50" cy="50" r="29"/>
-      <path d="M38 50h24"/>`),
+      <path d="M39 50h22"/>`),
     jinwen: stroke(
       `
       <circle cx="50" cy="50" r="31"/>
-      <circle cx="50" cy="50" r="5" fill="currentColor" stroke="none"/>`,
-      7
+      <path d="M50 44v12"/>`,
+      6.4
     ),
     xiaozhuan: stroke(
       `
       <path d="M30 16h40v68H30z"/>
       <path d="M30 50h40"/>`,
-      4.6
+      4.4
     )
   },
 
   yue: {
     char: '月',
     pinyin: 'yuè',
-    nature: '月亮',
-    sense: '像一弯月牙，中间一竖是月亮上的阴影。',
-    jiagu: `
-      <path d="M66 14C32 26 30 74 66 86 44 68 44 32 66 14Z" fill="currentColor"/>
-      <path d="M51 44v14" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>`
+    nature: 'moon',
+    sense: '一弯月牙，中间那一竖是月亮上的暗影。',
+    jiagu: stroke(`
+      <path d="M66 12C30 26 30 74 66 88 46 70 46 30 66 12Z"/>
+      <path d="M52 40v16"/>`)
   },
 
   mu: {
     char: '木',
     pinyin: 'mù',
-    nature: '树',
-    sense: '中间一竖是树干，上面分出枝，下面长出根。',
+    nature: 'tree',
+    sense: '中间一竖是树干，上面是枝，下面是根。',
     jiagu: stroke(`
       <path d="M50 12v78"/>
-      <path d="M50 38 26 18"/>
-      <path d="M50 38 74 18"/>
-      <path d="M50 62 24 86"/>
-      <path d="M50 62 76 86"/>`)
+      <path d="M50 36 26 16"/>
+      <path d="M50 36 74 16"/>
+      <path d="M50 60 24 84"/>
+      <path d="M50 60 76 84"/>`)
   },
 
   tian: {
     char: '田',
     pinyin: 'tián',
-    nature: '田地',
+    nature: 'field',
     sense: '方方正正一块地，中间的横竖是田埂。',
     jiagu: stroke(`
       <path d="M21 24h58v54H21z"/>
       <path d="M50 24v54"/>
       <path d="M21 51h58"/>`)
+  },
+
+  /* 备用题（第⑦节弹性时间用） */
+  mu_eye: {
+    char: '目',
+    pinyin: 'mù',
+    nature: 'eye',
+    sense: '横过来的一只眼睛，中间那一圈是眼珠。',
+    jiagu: stroke(`
+      <path d="M16 50C26 32 42 26 50 26s24 6 34 24c-10 18-26 24-34 24s-24-6-34-24Z"/>
+      <path d="M40 50a10 10 0 1 0 20 0 10 10 0 1 0-20 0Z"/>
+      <path d="M32 33 26 24"/>
+      <path d="M68 33 74 24"/>`)
   }
 }
 
-/** 商代四代字体阶段（用于「山」的演变动画） */
+/** 各字体阶段（用于「山」的演变时间轴） */
 export const SCRIPT_STAGES = [
-  { key: 'jiagu', name: '甲骨文', note: '商代 · 刻在龟甲兽骨上' },
-  { key: 'jinwen', name: '金文', note: '商周 · 铸在青铜器上' },
-  { key: 'xiaozhuan', name: '小篆', note: '秦代 · 统一的标准字' },
-  { key: 'lishu', name: '隶书', note: '汉代 · 笔画变平直' },
-  { key: 'kaishu', name: '楷书', note: '今天 · 我们写的字' }
+  { key: 'jiagu', name: '甲骨文', era: '商代', note: '刻在龟甲和兽骨上' },
+  { key: 'jinwen', name: '金文', era: '商周', note: '铸在青铜器上' },
+  { key: 'xiaozhuan', name: '小篆', era: '秦代', note: '全国统一的写法' },
+  { key: 'lishu', name: '隶书', era: '汉代', note: '笔画变得平直' },
+  { key: 'kaishu', name: '楷书', era: '今天', note: '我们现在写的字' }
 ]

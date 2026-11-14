@@ -3,20 +3,25 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import TeacherBar from './components/TeacherBar.vue'
 import S0Cover from './stages/S0Cover.vue'
 import S1Shang from './stages/S1Shang.vue'
-import S2Timeline from './stages/S2Timeline.vue'
-import S3Guess from './stages/S3Guess.vue'
-import S4Facts from './stages/S4Facts.vue'
-import S5Match from './stages/S5Match.vue'
-import S6End from './stages/S6End.vue'
+import S2Xiangxing from './stages/S2Xiangxing.vue'
+import S3Timeline from './stages/S3Timeline.vue'
+import S4Guess from './stages/S4Guess.vue'
+import S5Facts from './stages/S5Facts.vue'
+import S6Match from './stages/S6Match.vue'
+import S7End from './stages/S7End.vue'
+import S8Extra from './stages/S8Extra.vue'
 
+/* 与《一字千年》大纲一一对应 */
 const stages = [
-  { title: '神秘文字登场', comp: S0Cover },
-  { title: '商代与象形字', comp: S1Shang },
-  { title: '汉字演变', comp: S2Timeline },
-  { title: '猜猜乐', comp: S3Guess },
-  { title: '冷知识', comp: S4Facts },
-  { title: '配对挑战', comp: S5Match },
-  { title: '回到现代', comp: S6End }
+  { title: '① 神秘文字登场', comp: S0Cover },
+  { title: '② 回到商代', comp: S1Shang },
+  { title: '② 认识象形字', comp: S2Xiangxing },
+  { title: '② 汉字演变', comp: S3Timeline },
+  { title: '③ 猜猜乐', comp: S4Guess },
+  { title: '④ 冷知识', comp: S5Facts },
+  { title: '⑤ 配对挑战', comp: S6Match },
+  { title: '⑥ 回到现代', comp: S7End },
+  { title: '⑦ 弹性时间', comp: S8Extra }
 ]
 
 const index = ref(0)
@@ -24,6 +29,7 @@ const runId = ref(0)
 const warping = ref(false)
 const elapsed = ref(0)
 const isFullscreen = ref(false)
+const paused = ref(false)
 const scale = ref(1)
 
 function fit() {
@@ -92,6 +98,10 @@ function resetAll() {
   }
 }
 
+function togglePause() {
+  paused.value = !paused.value
+}
+
 async function toggleFullscreen() {
   try {
     if (!document.fullscreenElement) {
@@ -119,8 +129,14 @@ function onKeydown(event) {
     return
   }
 
-  // 数字键直达
-  if (/^[1-7]$/.test(event.key)) {
+  if (event.key === 'p' || event.key === 'P') {
+    event.preventDefault()
+    togglePause()
+    return
+  }
+
+  // 数字键直达（1–9）
+  if (/^[1-9]$/.test(event.key)) {
     event.preventDefault()
     go(Number(event.key) - 1)
     return
@@ -150,10 +166,10 @@ onMounted(() => {
   window.addEventListener('keydown', onKeydown)
   document.addEventListener('fullscreenchange', onFullscreenChange)
 
-  // 允许用 ?stage=3 直达某一节，便于课前检查与彩排
+  // ?stage=3 直达某一节，便于课前检查与彩排
   const param = new URLSearchParams(window.location.search).get('stage')
-  if (param && /^[1-7]$/.test(param)) {
-    index.value = Number(param) - 1
+  if (param && /^[1-9]$/.test(param)) {
+    index.value = Math.min(Number(param) - 1, stages.length - 1)
     if (index.value > 0) startClock()
   }
 })
@@ -169,14 +185,9 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="viewport" :class="{ 'on-dark': isCover }">
-    <div class="canvas" :style="{ transform: `translate(-50%, -50%) scale(${scale})` }">
+    <div class="canvas" :class="{ paused }" :style="{ transform: `translate(-50%, -50%) scale(${scale})` }">
       <Transition name="fade" mode="out-in">
-        <component
-          :is="current.comp"
-          :key="`${index}-${runId}`"
-          @launch="launch"
-          @restart="resetAll"
-        />
+        <component :is="current.comp" :key="`${index}-${runId}`" @launch="launch" @restart="resetAll" />
       </Transition>
 
       <TeacherBar
@@ -185,10 +196,12 @@ onBeforeUnmount(() => {
         :titles="titles"
         :elapsed="elapsed"
         :fullscreen="isFullscreen"
+        :paused="paused"
         @prev="prev"
         @next="next"
         @replay="replay"
         @reset="resetStage"
+        @toggle-pause="togglePause"
         @toggle-fullscreen="toggleFullscreen"
         @jump="go"
       />
@@ -233,6 +246,11 @@ onBeforeUnmount(() => {
 
 .viewport.on-dark .canvas {
   background: #100d0b;
+}
+
+/* 教师暂停：冻结所有动画，画面停在当前一帧 */
+.canvas.paused :deep(*) {
+  animation-play-state: paused !important;
 }
 
 /* 穿越动画 */

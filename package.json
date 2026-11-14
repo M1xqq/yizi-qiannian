@@ -1,0 +1,20 @@
+{
+  "name": "xinwen-tanyuan",
+  "private": true,
+  "version": "0.1.0",
+  "description": "心纹研学营 ·《一字千年》15分钟互动课程探源页（离线单文件）",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vite": "^6.0.11",
+    "vite-plugin-singlefile": "^2.1.0"
+  }
+}

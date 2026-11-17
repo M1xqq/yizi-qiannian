@@ -11,7 +11,7 @@ import S6Match from './stages/S6Match.vue'
 import S7End from './stages/S7End.vue'
 import S8Extra from './stages/S8Extra.vue'
 
-/* 与《一字千年》大纲一一对应 */
+/* 与《一纸千年》大纲一一对应 */
 const stages = [
   { title: '① 神秘文字登场', comp: S0Cover },
   { title: '② 回到商代', comp: S1Shang },

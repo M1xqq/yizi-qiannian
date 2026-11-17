@@ -23,10 +23,10 @@ const marks = [
     <header class="cover-head">
       <span class="seal">心纹</span>
       <div class="course">
-        <b>一字千年</b>
+        <b>一纸千年</b>
         <span>穿越三千年的汉字奇妙之旅</span>
       </div>
-      <span class="badge">心纹研学营 · 十楼探源</span>
+      <span class="badge">心纹研学营 · 十楼课程</span>
     </header>
 
     <div class="cover-body">

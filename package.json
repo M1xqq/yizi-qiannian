@@ -1,8 +1,8 @@
 {
-  "name": "xinwen-tanyuan",
+  "name": "yizi-qiannian",
   "private": true,
   "version": "0.1.0",
-  "description": "心纹研学营 ·《一字千年》15分钟互动课程探源页（离线单文件）",
+  "description": "心纹研学营 ·《一纸千年》15分钟互动课程投屏页（离线单文件）",
   "type": "module",
   "scripts": {
     "dev": "vite",

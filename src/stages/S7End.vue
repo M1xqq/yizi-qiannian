@@ -1,6 +1,7 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import XinwenLogo from '../components/XinwenLogo.vue'
+import { playSfx } from '../audio/sfx'
 
 const emit = defineEmits(['restart'])
 
@@ -9,6 +10,7 @@ let t1 = null
 let t2 = null
 
 onMounted(() => {
+  playSfx('drum2') // 领取通关徽章：一记大鼓
   t1 = setTimeout(() => { phase.value = 1 }, 2100)
   t2 = setTimeout(() => { phase.value = 2 }, 2900)
 })

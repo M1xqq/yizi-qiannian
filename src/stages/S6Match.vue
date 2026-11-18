@@ -1,6 +1,7 @@
 <script setup>
 import { computed, nextTick, onMounted, ref } from 'vue'
 import Glyph from '../components/Glyph.vue'
+import { playSfx } from '../audio/sfx'
 
 const items = [
   { name: 'shan', char: '山' },
@@ -51,6 +52,8 @@ async function pickRight(i) {
   const rightItem = rightList.value[i]
   if (leftItem.idx === rightItem.idx) {
     matched.value = [...matched.value, { l: pickedLeft.value, r: i, key: `${i}-${Date.now()}` }]
+    playSfx('bowl') // 配对成功：颂钵（连错不响）
+    if (matched.value.length === items.length) playSfx('drum') // 全部配对成功：加一记大鼓
     pickedLeft.value = -1
     await nextTick()
     measure()

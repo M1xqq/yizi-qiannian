@@ -10,6 +10,7 @@ import S5Facts from './stages/S5Facts.vue'
 import S6Match from './stages/S6Match.vue'
 import S7End from './stages/S7End.vue'
 import S8Extra from './stages/S8Extra.vue'
+import { loadSfx, playSfx, setSfxOn } from './audio/sfx'
 
 /* 与《一纸千年》大纲一一对应 */
 const stages = [
@@ -30,6 +31,7 @@ const warping = ref(false)
 const elapsed = ref(0)
 const isFullscreen = ref(false)
 const paused = ref(false)
+const soundOn = ref(true)
 const scale = ref(1)
 
 function fit() {
@@ -53,6 +55,7 @@ function startClock() {
 function go(i) {
   const next = Math.min(Math.max(i, 0), stages.length - 1)
   if (next === index.value) return
+  playSfx('drum') // 节间转场：一记大鼓
   index.value = next
   runId.value += 1
   if (next > 0) startClock()
@@ -72,6 +75,8 @@ function launch() {
   if (warping.value) return
   warping.value = true
   startClock()
+  playSfx('chime')
+  playSfx('dizi') // 穿越：风铃垫声 + 古笛
   warpTimer = setTimeout(() => {
     index.value = 1
     runId.value += 1
@@ -100,6 +105,11 @@ function resetAll() {
 
 function togglePause() {
   paused.value = !paused.value
+}
+
+function toggleSound() {
+  soundOn.value = !soundOn.value
+  setSfxOn(soundOn.value)
 }
 
 async function toggleFullscreen() {
@@ -162,6 +172,7 @@ function onKeydown(event) {
 
 onMounted(() => {
   fit()
+  loadSfx()
   window.addEventListener('resize', fit)
   window.addEventListener('keydown', onKeydown)
   document.addEventListener('fullscreenchange', onFullscreenChange)
@@ -197,11 +208,13 @@ onBeforeUnmount(() => {
         :elapsed="elapsed"
         :fullscreen="isFullscreen"
         :paused="paused"
+        :sound-on="soundOn"
         @prev="prev"
         @next="next"
         @replay="replay"
         @reset="resetStage"
         @toggle-pause="togglePause"
+        @toggle-sound="toggleSound"
         @toggle-fullscreen="toggleFullscreen"
         @jump="go"
       />

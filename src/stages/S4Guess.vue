@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import Glyph from '../components/Glyph.vue'
 import SceneArt from '../components/SceneArt.vue'
+import { playSfx } from '../audio/sfx'
 
 const questions = [
   {
@@ -42,6 +43,7 @@ function choose(opt) {
   if (locked.value) return
   picked.value = opt
   locked.value = true
+  if (opt === q.value.answer) playSfx('bowl') // 答对：颂钵一声（答错不响）
 }
 
 function nextQuestion() {

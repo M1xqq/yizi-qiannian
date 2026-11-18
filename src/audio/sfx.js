@@ -16,6 +16,8 @@ const state = {
   master: null,
   buffers: {},
   loaded: false,
+  mode: null,
+  elems: null,
   on: true
 }
 
@@ -35,20 +37,47 @@ function init() {
 
 export async function loadSfx() {
   init()
-  if (!state.ctx || state.loaded) return
+  if (state.loaded) return
+  if (state.ctx) {
+    try {
+      await Promise.all(
+        Object.entries(defs).map(async ([name, def]) => {
+          if (state.buffers[name]) return
+          const res = await fetch(def.src)
+          const raw = await res.arrayBuffer()
+          state.buffers[name] = await state.ctx.decodeAudioData(raw)
+        })
+      )
+      state.mode = 'buffer'
+      state.loaded = true
+      return
+    } catch (e) {
+      /* file:// 下 fetch 被 CORS 拦截，退回 audio 元素模式 */
+    }
+  }
+  // 元素模式兜底：用 <audio> 标签播放
+  state.mode = 'element'
+  state.elems = {}
+  Object.entries(defs).forEach(([name, def]) => {
+    const a = new Audio(def.src)
+    a.preload = 'auto'
+    state.elems[name] = a
+  })
   await Promise.all(
-    Object.entries(defs).map(async ([name, def]) => {
-      if (state.buffers[name]) return
-      const res = await fetch(def.src)
-      const raw = await res.arrayBuffer()
-      state.buffers[name] = await state.ctx.decodeAudioData(raw)
-    })
+    Object.values(state.elems).map(a => new Promise(res => {
+      if (a.readyState >= 3) return res()
+      a.addEventListener('canplaythrough', res, { once: true })
+      a.addEventListener('error', res, { once: true })
+      setTimeout(res, 3000)
+    }))
   )
   state.loaded = true
 }
 
 export function playSfx(name) {
-  if (!state.on || !state.loaded || !state.ctx || !state.buffers[name]) return
+  if (!state.on || !state.loaded) return
+  if (state.mode === 'element') return playElement(name)
+  if (!state.ctx || !state.buffers[name]) return
   if (state.ctx.state === 'suspended') state.ctx.resume()
   const def = defs[name]
   const src = state.ctx.createBufferSource()
@@ -64,6 +93,32 @@ export function playSfx(name) {
   src.connect(g)
   g.connect(state.master)
   src.start(t, def.offset, def.dur + 0.05)
+}
+
+function playElement(name) {
+  const def = defs[name]
+  const a = state.elems && state.elems[name]
+  if (!a) return
+  try { a.pause() } catch (e) { /* ignore */ }
+  a.currentTime = def.offset
+  a.volume = 0.0001
+  a.play().catch(() => {})
+  const fi = def.fadeIn || 0.02
+  const fo = def.fadeOut || 0.5
+  const g = Math.min(1, def.gain)
+  const t0 = performance.now()
+  const ramp = setInterval(() => {
+    const el = (performance.now() - t0) / 1000
+    let v
+    if (el < fi) v = (g * el) / fi
+    else if (el > def.dur - fo) v = g * Math.max(0, (def.dur - el) / fo)
+    else v = g
+    a.volume = Math.min(1, Math.max(0.0001, v))
+    if (el >= def.dur) {
+      clearInterval(ramp)
+      a.pause()
+    }
+  }, 40)
 }
 
 export function setSfxOn(v) {

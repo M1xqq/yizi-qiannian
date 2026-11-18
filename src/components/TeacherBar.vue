@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 const props = defineProps({
   index: { type: Number, required: true },
@@ -13,6 +13,9 @@ const props = defineProps({
 
 const emit = defineEmits(['prev', 'next', 'replay', 'reset', 'toggle-pause', 'toggle-sound', 'toggle-fullscreen', 'jump'])
 
+const open = ref(true)
+const toggleOpen = () => { open.value = !open.value }
+
 const clock = computed(() => {
   const m = Math.floor(props.elapsed / 60)
   const s = props.elapsed % 60
@@ -21,7 +24,10 @@ const clock = computed(() => {
 </script>
 
 <template>
-  <div class="bar" role="toolbar" aria-label="教师控制条">
+  <button class="bar-toggle" :class="{ off: !open }" :title="open ? '收起控制条' : '展开控制条'" @click="toggleOpen">
+    {{ open ? '✕' : '☰' }}
+  </button>
+  <div class="bar" :class="{ hidden: !open }" role="toolbar" aria-label="教师控制条">
     <button class="arrow" :disabled="index === 0" title="上一节（←）" @click="emit('prev')">←</button>
 
     <div class="dots">
@@ -61,6 +67,35 @@ const clock = computed(() => {
 </template>
 
 <style scoped>
+.bar-toggle {
+  position: fixed;
+  right: 2.4%;
+  bottom: 18px;
+  z-index: 61;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  color: var(--brown);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bar-toggle:hover {
+  transform: scale(1.08);
+  background: #fff;
+}
+
+.bar-toggle.off {
+  background: var(--cinnabar-soft);
+  color: var(--cinnabar);
+}
+
 .bar {
   position: fixed;
   left: 50%;
@@ -76,9 +111,13 @@ const clock = computed(() => {
   box-shadow: var(--shadow);
   backdrop-filter: blur(10px);
   opacity: 0.55;
-  transition: opacity 0.25s ease;
+  transition: opacity 0.25s ease, transform 0.3s ease;
   z-index: 60;
   max-width: 1180px;
+}
+
+.bar.hidden {
+  transform: translateX(-50%) translateY(140%);
 }
 
 .bar:hover,

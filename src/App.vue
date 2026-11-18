@@ -75,8 +75,7 @@ function launch() {
   if (warping.value) return
   warping.value = true
   startClock()
-  playSfx('chime')
-  playSfx('dizi') // 穿越：风铃垫声 + 古笛
+  playSfx('chime') // 穿越：风铃声
   warpTimer = setTimeout(() => {
     index.value = 1
     runId.value += 1

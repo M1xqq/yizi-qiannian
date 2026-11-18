@@ -1,13 +1,11 @@
 // 古风音效系统（Web Audio 截段播放 · 无背景循环）
 // 素材来源与许可证见 ../assets/audio/来源说明.md
 import chimeUrl from '../assets/audio/chime.mp3'
-import diziUrl from '../assets/audio/dizi.mp3'
 import taikoUrl from '../assets/audio/taiko.mp3'
 import bowlUrl from '../assets/audio/bowl.mp3'
 
 const defs = {
-  chime: { src: chimeUrl, offset: 0.30, dur: 2.60, gain: 0.50, fadeIn: 0.25, fadeOut: 0.80 }, // 风铃：穿越垫声
-  dizi: { src: diziUrl, offset: 4.40, dur: 4.20, gain: 0.90, fadeIn: 0.30, fadeOut: 1.20 }, // 古笛：穿越主声
+  chime: { src: chimeUrl, offset: 0.30, dur: 4.50, gain: 0.70, fadeIn: 0.25, fadeOut: 1.00 }, // 风铃：穿越主声（全段）
   drum: { src: taikoUrl, offset: 4.62, dur: 1.90, gain: 0.85, fadeIn: 0.01, fadeOut: 0.50 }, // 大鼓：节间转场
   drum2: { src: taikoUrl, offset: 6.75, dur: 1.80, gain: 0.80, fadeIn: 0.01, fadeOut: 0.50 }, // 大鼓：领取徽章
   bowl: { src: bowlUrl, offset: 0.72, dur: 3.10, gain: 3.00, fadeIn: 0.02, fadeOut: 0.90 } // 颂钵：答对
